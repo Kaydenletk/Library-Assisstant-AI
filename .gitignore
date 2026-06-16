@@ -45,3 +45,6 @@ next-env.d.ts
 
 # claude code local settings (launch.json is shareable; local settings are not)
 .claude/settings.local.json
+
+# playwright mcp artifacts
+.playwright-mcp/

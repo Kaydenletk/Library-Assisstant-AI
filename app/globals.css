@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
+/* ── Design tokens ──────────────────────────────────────────────────────────
+   Direction: technical-editorial. Warm paper surface, near-black ink, one
+   electric accent, version-coded badges. Light by default (a dev reference tool,
+   not a dashboard). Geist Sans for prose, Geist Mono for code + citations. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: oklch(98.5% 0.004 95);
+  --paper-raised: oklch(100% 0 0);
+  --ink: oklch(22% 0.012 270);
+  --ink-soft: oklch(46% 0.012 270);
+  --ink-faint: oklch(64% 0.01 270);
+  --line: oklch(90% 0.006 270);
+  --line-strong: oklch(83% 0.008 270);
+
+  --accent: oklch(54% 0.2 268);
+  --accent-press: oklch(47% 0.2 268);
+  --accent-wash: oklch(96% 0.03 268);
+
+  /* version semantics: v1 stable / v2 alpha / spec protocol */
+  --v1: oklch(58% 0.13 70);    /* amber  */
+  --v1-wash: oklch(95% 0.04 70);
+  --v2: oklch(55% 0.18 300);   /* violet */
+  --v2-wash: oklch(95% 0.04 300);
+  --spec: oklch(52% 0.1 195);  /* teal   */
+  --spec-wash: oklch(95% 0.035 195);
+
+  --code-bg: oklch(20% 0.014 270);
+  --code-ink: oklch(92% 0.01 270);
+
+  --text-hero: clamp(2.25rem, 1.2rem + 3.6vw, 3.75rem);
+  --space-rail: clamp(1rem, 0.4rem + 2.5vw, 2.5rem);
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --duration: 200ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-raised: 0 1px 2px oklch(22% 0.012 270 / 0.04), 0 8px 24px oklch(22% 0.012 270 / 0.06);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, var(--accent-wash) 0%, transparent 42%),
+    var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper-raised);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto;
+  }
 }

@@ -1,65 +1,100 @@
-import Image from "next/image";
+'use client';
+
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport, type UIMessage } from 'ai';
+import { useEffect, useRef } from 'react';
+import { AssistantMessage } from '@/components/chat/AssistantMessage';
+import { Composer } from '@/components/chat/Composer';
+import { StarterPrompts } from '@/components/chat/StarterPrompts';
+import './chat.css';
+
+/** Concatenate the text parts of a UI message. */
+function messageText(m: UIMessage): string {
+  return m.parts
+    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+    .map((p) => p.text)
+    .join('');
+}
+
+/** True while the model is searching docs but hasn't emitted answer text yet. */
+function isThinking(m: UIMessage): boolean {
+  return m.role === 'assistant' && messageText(m).trim() === '';
+}
 
 export default function Home() {
+  const { messages, sendMessage, status, stop } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/chat' }),
+  });
+
+  const busy = status === 'submitted' || status === 'streaming';
+  const empty = messages.length === 0;
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages]);
+
+  const ask = (text: string) => sendMessage({ text });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="app">
+      <header className="masthead">
+        <div className="masthead__inner">
+          <div className="wordmark">
+            <span className="wordmark__mark">MCP</span>
+            <span className="wordmark__rest">/ docs assistant</span>
+          </div>
+          <ul className="creds">
+            <li><b>version-correct</b> v1 · v2</li>
+            <li><b>cites</b> every source</li>
+            <li><b>refuses</b> when uncovered</li>
+          </ul>
+        </div>
+      </header>
+
+      <main className="thread" aria-live="polite">
+        {empty ? (
+          <section className="intro">
+            <p className="intro__eyebrow">Model Context Protocol · TypeScript SDK</p>
+            <h1 className="intro__title">
+              Ask the docs. Get <em>version-correct</em>, cited answers — or an honest “I don’t know.”
+            </h1>
+            <p className="intro__sub">
+              Retrieval-grounded over the v1 &amp; v2 SDK docs and the protocol spec. It tells you
+              which version an answer belongs to, links the exact source, and refuses to guess.
+            </p>
+            <StarterPrompts onPick={ask} />
+          </section>
+        ) : (
+          <ol className="messages">
+            {messages.map((m) => (
+              <li key={m.id} className={`turn turn--${m.role}`}>
+                <span className="turn__role">{m.role === 'user' ? 'You' : 'Assistant'}</span>
+                {m.role === 'user' ? (
+                  <p className="user-message">{messageText(m)}</p>
+                ) : isThinking(m) ? (
+                  <p className="thinking">
+                    <span className="thinking__dot" />
+                    Searching the docs…
+                  </p>
+                ) : (
+                  <AssistantMessage text={messageText(m)} />
+                )}
+              </li>
+            ))}
+            <div ref={bottomRef} />
+          </ol>
+        )}
+      </main>
+
+      <footer className="dock">
+        <div className="dock__inner">
+          <Composer onSend={ask} onStop={stop} busy={busy} />
+          <p className="dock__hint">
+            Answers are grounded in the official docs. Not affiliated with the MCP project.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </footer>
     </div>
   );
 }
