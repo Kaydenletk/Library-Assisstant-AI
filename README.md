@@ -100,7 +100,25 @@ pnpm mcp   # stdio server: ask_mcp_docs + search_mcp_docs
 - **Next.js 16** (App Router) · **AI SDK v6** (`generateText`/`streamText`, tool calling, `embed`)
 - **Google Gemini** — `gemini-2.5-flash` (chat), `flash-lite` (rerank), `gemini-embedding-001` (1536-d)
 - **Neon Postgres + pgvector** (HNSW cosine) · **Drizzle ORM**
-- **Zod** · **Vitest** (55 unit tests) · **`@modelcontextprotocol/sdk`**
+- **Zod** · **Vitest** (58 unit tests) · **`@modelcontextprotocol/sdk`**
+- **LangGraph** — optional Corrective-RAG variant (see below)
+
+### Bonus: a LangGraph Corrective-RAG variant
+
+The product agent is a lean AI SDK tool-loop. As a showcase of where a graph
+framework actually earns its place, `lib/agent/graph.ts` reimplements the agent
+as an explicit **LangGraph** state machine that **grades its own retrieval and
+re-queries** when it's weak:
+
+```text
+rewrite → retrieve → grade ─┬─ confident ──────────► generate ─► END
+   ▲                        ├─ weak, tries left ────► (loop back)
+   └────────────────────────┘
+                            └─ weak, out of tries ──► refuse  ─► END
+```
+
+It reuses the same hybrid retrieval + rerank + refusal gate, so the moat is
+identical — the graph only adds the self-correcting loop. Run: `pnpm answer:graph "…"`.
 
 ---
 
@@ -113,7 +131,8 @@ pnpm db:setup && pnpm db:push   # pgvector + schema + full-text index
 pnpm ingest                     # clone + embed the corpora (one-time)
 
 pnpm dev                        # web chat at localhost:3000
-pnpm answer "how do I register a tool?"   # CLI
+pnpm answer "how do I register a tool?"   # CLI (AI SDK agent)
+pnpm answer:graph "how do I register a tool?"  # CLI (LangGraph Corrective-RAG)
 pnpm eval                       # scorecard
 pnpm mcp                        # MCP server
 ```

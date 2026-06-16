@@ -15,12 +15,16 @@
     "ingest": "tsx scripts/ingest.ts",
     "ask": "tsx scripts/ask.ts",
     "answer": "tsx scripts/answer.ts",
+    "answer:graph": "tsx scripts/answer-graph.ts",
     "eval": "tsx scripts/eval.ts",
     "mcp": "tsx mcp-server/index.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.82",
     "@ai-sdk/react": "^3.0.207",
+    "@langchain/core": "^1.1.49",
+    "@langchain/google-genai": "^2.1.31",
+    "@langchain/langgraph": "^1.4.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@neondatabase/serverless": "^1.1.0",
     "ai": "^6.0.205",
