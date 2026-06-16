@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { splitCodeBlocks } from '@/lib/ui/blocks';
 import { parseCitations, splitInlineCode } from '@/lib/ui/citations';
 import { CitationChip } from './CitationChip';
+import { CopyButton } from './CopyButton';
 
 /** Render a text run, styling inline `code` spans. */
 function InlineText({ text }: { text: string }) {
@@ -44,6 +45,7 @@ export function AssistantMessage({ text }: { text: string }) {
       {blocks.map((block, i) =>
         block.type === 'code' ? (
           <pre key={i} className="code-block" data-lang={block.lang}>
+            <CopyButton code={block.value} />
             <code>{block.value}</code>
           </pre>
         ) : (

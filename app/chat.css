@@ -270,7 +270,7 @@
   content: attr(data-lang);
   position: absolute;
   top: 0.5rem;
-  right: 0.75rem;
+  right: 4rem;
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -278,6 +278,36 @@
 }
 .code-block code {
   font-family: inherit;
+}
+
+.code-block__copy{
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duration) var(--ease), color var(--duration) var(--ease),
+  border-color var(--duration) var(--ease);
+}
+
+.code-block:hover .code-block__copy,
+.code-block:focus-within .code-block__copy{
+  opacity: 1;
+}
+
+.code-block__copy:focus-visible{
+  opacity: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Citation chips ----------------------------------------------------------- */
