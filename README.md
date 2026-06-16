@@ -2,6 +2,8 @@
 
 > An agentic RAG assistant for the **Model Context Protocol TypeScript SDK** that answers "how do I…?" with **version-correct (v1 vs v2), cited** answers — and **refuses** when the docs don't cover it.
 
+**▶ Live demo: [library-assisstant-ai.vercel.app](https://library-assisstant-ai.vercel.app)**
+
 ![Hero](assets/hero.png)
 
 ---
@@ -138,6 +140,22 @@ pnpm mcp                        # MCP server
 ```
 
 Deploy + observability: see [DEPLOY.md](DEPLOY.md). Engineering log: [STATUS.md](STATUS.md).
+
+## Roadmap / help wanted
+
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[`good first issue`](https://github.com/Kaydenletk/mcp-docs-assistant/labels/good%20first%20issue) label.
+
+- [ ] LLM-as-judge faithfulness scoring in the eval harness (RAGAS-style)
+- [ ] Benchmark table vs Context7 / DeepWiki
+- [ ] More corpora (additional protocol revisions, other SDK languages)
+- [ ] Conversation history persistence
+- [ ] Dark theme
+- [ ] Show retrieval/tool steps live in the UI
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
