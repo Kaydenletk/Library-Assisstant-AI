@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Cloned vendor SDK/spec repos pulled in by `pnpm ingest`. Gitignored, so
+    // absent in CI — ignoring here keeps local lint identical to CI.
+    ".cache/**",
   ]),
 ]);
 

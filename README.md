@@ -4,6 +4,8 @@
 
 **▶ Live demo: [library-assisstant-ai.vercel.app](https://library-assisstant-ai.vercel.app)**
 
+[![CI](https://github.com/Kaydenletk/mcp-docs-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/Kaydenletk/mcp-docs-assistant/actions/workflows/ci.yml)
+
 ![Hero](assets/hero.png)
 
 ---
@@ -65,6 +67,28 @@ return { relevant: true, results };
 
 Three surfaces from one codebase: **web chat**, **CLI**, and an **MCP server**.
 
+### Corrective-RAG loop (`answer:graph`)
+
+The graph variant adds a self-correcting query-rewrite loop on top of the same
+retrieval + refusal gate. If retrieval is weak it rephrases and retries; only
+when it runs out of tries does it refuse — so it explores before giving up.
+
+```mermaid
+flowchart LR
+    Q([question]) --> RW[rewrite query]
+    RW --> RT["retrieve<br/>(hybrid + rerank)"]
+    RT --> GR{confident<br/>match?}
+    GR -->|yes| GEN["generate<br/>cited answer"]
+    GR -->|weak, tries left| RW
+    GR -->|weak, out of tries| REF[refuse]
+    GEN --> E([END])
+    REF --> E([END])
+```
+
+The confidence gate (`hasConfidentMatch`, cosine ≥ 0.45) and `MAX_ATTEMPTS` live
+in [`lib/agent/gate.ts`](lib/agent/gate.ts) and [`lib/agent/corrective.ts`](lib/agent/corrective.ts);
+the state machine is [`lib/agent/graph.ts`](lib/agent/graph.ts).
+
 ---
 
 ## Proven, not just demoed
@@ -102,7 +126,7 @@ pnpm mcp   # stdio server: ask_mcp_docs + search_mcp_docs
 - **Next.js 16** (App Router) · **AI SDK v6** (`generateText`/`streamText`, tool calling, `embed`)
 - **Google Gemini** — `gemini-2.5-flash` (chat), `flash-lite` (rerank), `gemini-embedding-001` (1536-d)
 - **Neon Postgres + pgvector** (HNSW cosine) · **Drizzle ORM**
-- **Zod** · **Vitest** (58 unit tests) · **`@modelcontextprotocol/sdk`**
+- **Zod** · **Vitest** (80 unit tests, run in CI) · **`@modelcontextprotocol/sdk`**
 - **LangGraph** — optional Corrective-RAG variant (see below)
 
 ### Bonus: a LangGraph Corrective-RAG variant

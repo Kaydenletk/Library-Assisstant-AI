@@ -33,6 +33,11 @@ pnpm eval         # scorecard against the golden set (needs DB + key)
 ```
 
 Before opening a PR, make sure `pnpm test` and `pnpm typecheck` are green.
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs `typecheck`,
+`lint`, and `test` on every PR — these block merge if they fail. The unit suite
+is fully mocked, so it passes without a DB or API key (fork PRs included). The
+live `pnpm eval` scorecard needs secrets, so run it locally and paste results
+into PRs that touch retrieval or the agent.
 
 ## Code conventions
 
