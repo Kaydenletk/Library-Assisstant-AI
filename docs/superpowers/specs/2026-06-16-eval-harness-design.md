@@ -1,8 +1,24 @@
 # Plan 4 — Eval Harness + Benchmark (Design)
 
 **Date:** 2026-06-16
-**Status:** Approved, ready for implementation
+**Status:** Implemented (reconciled — see note).
 **Depends on:** Plans 1–3 (ingestion, agentic retrieval + refusal gate, chat UI) — all complete.
+
+> **Reconciliation note (post-design):** while implementing, an existing committed
+> Plan-4 harness was found (`eval/dataset.ts`, `eval/metrics.ts`, `scripts/eval.ts`,
+> shipped in `feat(plan4): eval harness + eval-driven over-refusal fix`). Rather than
+> the standalone `eval/golden.jsonl` + `lib/eval/{golden,score,report}.ts` design
+> below, we **kept the committed harness and extended it** — its scorer reuses the
+> UI's `parseCitations` (one citation parser, DRY). What actually shipped:
+> `eval/dataset.ts` grown to 18 cases, a new pure `eval/report.ts`
+> (`scorecard` + `renderReport`) writing `docs/eval/REPORT.md`, `docs/eval/BENCHMARK.md`,
+> and `tests/eval-report.test.ts`. The axes, two-disciplines focus, and benchmark
+> approach below all hold; only the file layout differs. The `--retrieval` mode and
+> zod-validated JSONL from this design were dropped as unneeded.
+
+---
+
+_Original design (for reference) follows._
 
 ## Goal
 

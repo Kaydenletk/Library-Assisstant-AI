@@ -93,20 +93,30 @@ the state machine is [`lib/agent/graph.ts`](lib/agent/graph.ts).
 
 ## Proven, not just demoed
 
-A 12-case golden set (`eval/`) scores the behaviours that matter. `pnpm eval`:
+An 18-case golden set (`eval/`) scores the behaviours that matter. `pnpm eval`
+runs every case through the live agent and writes a scorecard to
+[`docs/eval/REPORT.md`](docs/eval/REPORT.md):
 
 ```text
-Overall pass        12/12 (100%)
-Refusal accuracy     3/3 (100%)
-Answer + citation    9/9 (100%)
-Version-correctness  3/3 (100%)
+Overall pass        18/18 (100%)
+Refusal accuracy     5/5 (100%)
+Answer + citation   13/13 (100%)
+Version-correctness  5/5 (100%)
 ```
 
-The harness earned its keep: the first run scored **83%** — two answerable
+100% is against this repo's own curated golden set — it proves the system holds
+its three-discipline contract on representative questions, not that it's
+omniscient. Expanding the set is how regressions get caught.
+
+The harness earned its keep: an earlier run scored **83%** — two answerable
 questions were *false-refused* despite strong retrieval (top hits 0.70–0.72,
 well above the 0.45 gate). The model was over-refusing by re-judging relevance
 itself; the fix was to make refusal defer to the tool's signal. Re-run: 100%,
-with refusal accuracy still 100%.
+refusal accuracy still 100%.
+
+How it stacks up against Context7 / DeepWiki on version-isolation and refusal —
+the axes generic doc bots can't hold — is in
+[`docs/eval/BENCHMARK.md`](docs/eval/BENCHMARK.md).
 
 ---
 
@@ -171,7 +181,7 @@ Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [`good first issue`](https://github.com/Kaydenletk/mcp-docs-assistant/labels/good%20first%20issue) label.
 
 - [ ] LLM-as-judge faithfulness scoring in the eval harness (RAGAS-style)
-- [ ] Benchmark table vs Context7 / DeepWiki
+- [x] Benchmark methodology vs Context7 / DeepWiki — [`docs/eval/BENCHMARK.md`](docs/eval/BENCHMARK.md) (live comparison columns: help wanted)
 - [ ] More corpora (additional protocol revisions, other SDK languages)
 - [ ] Conversation history persistence
 - [ ] Dark theme

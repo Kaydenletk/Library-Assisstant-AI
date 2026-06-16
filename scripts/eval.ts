@@ -1,15 +1,12 @@
 import '../lib/load-env';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { answer } from '../lib/agent/answer';
 import { GOLDEN } from '../eval/dataset';
 import { scoreCase, type CaseResult } from '../eval/metrics';
+import { scorecard, renderReport } from '../eval/report';
 
-/** Aggregate a metric over the cases it applies to. */
-function rate(results: CaseResult[], applies: (r: CaseResult) => boolean): string {
-  const subset = results.filter(applies);
-  if (subset.length === 0) return 'n/a';
-  const passed = subset.filter((r) => r.pass).length;
-  return `${passed}/${subset.length} (${Math.round((passed / subset.length) * 100)}%)`;
-}
+const REPORT_PATH = join(process.cwd(), 'docs', 'eval', 'REPORT.md');
 
 async function main() {
   console.log(`\nRunning eval over ${GOLDEN.length} cases…\n`);
@@ -25,20 +22,20 @@ async function main() {
     console.log(`${mark} ${c.id.padEnd(16)} expect:${c.expect.padEnd(7)} ${detail}`);
   }
 
-  const overall = rate(results, () => true);
-  const refusal = rate(results, (r) => r.expect === 'refuse');
-  const answered = rate(results, (r) => r.expect === 'answer');
-  const versioned = rate(
-    results,
-    (r) => r.expect === 'answer' && GOLDEN.find((c) => c.id === r.id)?.version !== undefined,
-  );
+  const sc = scorecard(GOLDEN, results);
+  const band = (b: { passed: number; total: number }) =>
+    b.total === 0 ? 'n/a' : `${b.passed}/${b.total} (${Math.round((b.passed / b.total) * 100)}%)`;
 
   console.log('\n── Scorecard ───────────────────────────────');
-  console.log(`Overall pass        ${overall}`);
-  console.log(`Refusal accuracy    ${refusal}`);
-  console.log(`Answer + citation   ${answered}`);
-  console.log(`Version-correctness ${versioned}`);
-  console.log('─────────────────────────────────────────────\n');
+  console.log(`Overall pass        ${band(sc.overall)}`);
+  console.log(`Refusal accuracy    ${band(sc.refusal)}`);
+  console.log(`Answer + citation   ${band(sc.answered)}`);
+  console.log(`Version-correctness ${band(sc.versioned)}`);
+  console.log('─────────────────────────────────────────────');
+
+  mkdirSync(join(process.cwd(), 'docs', 'eval'), { recursive: true });
+  writeFileSync(REPORT_PATH, renderReport(GOLDEN, results));
+  console.log(`Wrote ${REPORT_PATH}\n`);
 
   const failed = results.filter((r) => !r.pass);
   if (failed.length > 0) {
