@@ -27,7 +27,10 @@ export default function Home() {
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
-  const [mode, setMode] = useState<ChatMode>('agent');
+  const [mode, setMode] = useState<ChatMode>(() => {
+    if (typeof window === 'undefined') return 'agent';
+    return (localStorage.getItem('chatMode') as ChatMode) ?? 'agent';
+  });  
   const busy = status === 'submitted' || status === 'streaming';
   const empty = messages.length === 0;
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -94,7 +97,11 @@ export default function Home() {
       <footer className="dock">
         <div className="dock__inner">
           <div className="dock__bar">
-            <ModeToggle mode={mode} onChange={setMode} disabled={busy} />
+            <ModeToggle
+              mode={mode}
+              onChange={(m) => { setMode(m); localStorage.setItem('chatMode', m); }}
+              disabled={busy}
+            />
           </div>
           <Composer onSend={ask} onStop={stop} busy={busy} />
           <p className="dock__hint">
